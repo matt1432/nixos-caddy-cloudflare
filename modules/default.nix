@@ -1,11 +1,18 @@
-inputs: {
+self: {
   config,
   lib,
   pkgs,
   ...
-}:
-with lib; let
+}: let
+  inherit (lib) types literalExpression;
+  inherit (lib.attrsets) attrValues catAttrs listToAttrs nameValuePair optionalAttrs;
+  inherit (lib.lists) filter optional unique;
+  inherit (lib.modules) mkDefault mkIf;
+  inherit (lib.options) mkEnableOption mkOption mkRemovedOptionModule mkRenamedOptionModule;
+  inherit (lib.strings) concatMapStringsSep concatStringsSep optionalString stringLength substring toUpper;
+
   cfg = config.services.caddy;
+
   acmeVHosts = filter (hostOpts: hostOpts.useACMEHost != null) (attrValues cfg.virtualHosts);
 
   capitalize = str:
@@ -95,10 +102,10 @@ with lib; let
 
   acmeHosts = unique (catAttrs "useACMEHost" acmeVHosts);
 
-  mkCertOwnershipAssertion = import (inputs.nixpkgs + /nixos/modules/security/acme/mk-cert-ownership-assertion.nix);
+  mkCertOwnershipAssertion = import "${pkgs.path}/nixos/modules/security/acme/mk-cert-ownership-assertion.nix";
 in {
   disabledModules = [
-    (inputs.nixpkgs + /nixos/modules/services/web-servers/caddy/default.nix)
+    "${pkgs.path}/nixos/modules/services/web-servers/caddy/default.nix"
   ];
 
   imports = [
@@ -109,12 +116,12 @@ in {
 
   # interface
   options.services.caddy = {
-    enable = mkEnableOption (lib.mdDoc "Caddy web server");
+    enable = mkEnableOption "Caddy web server";
 
     user = mkOption {
       default = "caddy";
       type = types.str;
-      description = lib.mdDoc ''
+      description = ''
         User account under which caddy runs.
 
         ::: {.note}
@@ -128,7 +135,7 @@ in {
     group = mkOption {
       default = "caddy";
       type = types.str;
-      description = lib.mdDoc ''
+      description = ''
         Group account under which caddy runs.
 
         ::: {.note}
@@ -140,10 +147,10 @@ in {
     };
 
     package = mkOption {
-      default = pkgs.caddy;
-      defaultText = literalExpression "pkgs.caddy";
+      default = self.packages.${pkgs.system}.default;
+      defaultText = "self.packages.<system>.default";
       type = types.package;
-      description = lib.mdDoc ''
+      description = ''
         Caddy package to use.
       '';
     };
@@ -151,7 +158,7 @@ in {
     dataDir = mkOption {
       type = types.path;
       default = "/var/lib/caddy";
-      description = lib.mdDoc ''
+      description = ''
         The data directory for caddy.
 
         ::: {.note}
@@ -168,7 +175,7 @@ in {
     logDir = mkOption {
       type = types.path;
       default = "/var/log/caddy";
-      description = lib.mdDoc ''
+      description = ''
         Directory for storing Caddy access logs.
 
         ::: {.note}
@@ -187,7 +194,7 @@ in {
       example = literalExpression ''
         mkForce "level INFO";
       '';
-      description = lib.mdDoc ''
+      description = ''
         Configuration for the default logger. See
         <https://caddyserver.com/docs/caddyfile/options#log>
         for details.
@@ -207,7 +214,7 @@ in {
           file_server
         ''';
       '';
-      description = lib.mdDoc ''
+      description = ''
         Override the configuration file used by Caddy. By default,
         NixOS generates one automatically.
 
@@ -225,7 +232,7 @@ in {
       '';
       example = literalExpression "nginx";
       type = with types; nullOr str;
-      description = lib.mdDoc ''
+      description = ''
         Name of the config adapter to use.
         See <https://caddyserver.com/docs/config-adapters>
         for the full list.
@@ -247,7 +254,7 @@ in {
     resume = mkOption {
       default = false;
       type = types.bool;
-      description = lib.mdDoc ''
+      description = ''
         Use saved config, if any (and prefer over any specified configuration passed with `--config`).
       '';
     };
@@ -263,7 +270,7 @@ in {
           }
         }
       '';
-      description = lib.mdDoc ''
+      description = ''
         Additional lines of configuration appended to the global config section
         of the `Caddyfile`.
 
@@ -282,14 +289,14 @@ in {
           root /srv/http
         }
       '';
-      description = lib.mdDoc ''
+      description = ''
         Additional lines of configuration appended to the automatically
         generated `Caddyfile`.
       '';
     };
 
     virtualHosts = mkOption {
-      type = with types; attrsOf (submodule (import ./vhost-options.nix {inherit cfg;}));
+      type = types.attrsOf (types.submodule (import ./vhost-options.nix {inherit cfg;}));
       default = {};
       example = literalExpression ''
         {
@@ -302,7 +309,7 @@ in {
           };
         };
       '';
-      description = lib.mdDoc ''
+      description = ''
         Declarative specification of virtual hosts served by Caddy.
       '';
     };
@@ -311,7 +318,7 @@ in {
       default = null;
       example = "https://acme-v02.api.letsencrypt.org/directory";
       type = with types; nullOr str;
-      description = lib.mdDoc ''
+      description = ''
         ::: {.note}
         Sets the [`acme_ca` option](https://caddyserver.com/docs/caddyfile/options#acme-ca)
         in the global options block of the resulting Caddyfile.
@@ -331,7 +338,7 @@ in {
     email = mkOption {
       default = null;
       type = with types; nullOr str;
-      description = lib.mdDoc ''
+      description = ''
         Your email address. Mainly used when creating an ACME account with your
         CA, and is highly recommended in case there are problems with your
         certificates.
@@ -341,7 +348,7 @@ in {
     enableReload = mkOption {
       default = true;
       type = types.bool;
-      description = lib.mdDoc ''
+      description = ''
         Reload Caddy instead of restarting it when configuration file changes.
 
         Note that enabling this option requires the [admin API](https://caddyserver.com/docs/caddyfile/options#admin)
@@ -357,7 +364,7 @@ in {
     settings = mkOption {
       type = settingsFormat.type;
       default = {};
-      description = lib.mdDoc ''
+      description = ''
         Structured configuration for Caddy to generate a Caddy JSON configuration file.
         See <https://caddyserver.com/docs/json/> for available options.
 

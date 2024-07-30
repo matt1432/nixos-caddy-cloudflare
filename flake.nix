@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = inputs @ {
+  outputs = {
     self,
     nixpkgs,
     ...
@@ -24,16 +24,16 @@
 
     perSystem = attrs:
       nixpkgs.lib.genAttrs supportedSystems (system:
-        attrs system nixpkgs.legacyPackages.${system});
+        attrs (import nixpkgs {inherit system;}));
   in {
-    packages = perSystem (system: pkgs: {
+    packages = perSystem (pkgs: {
       caddy = pkgs.callPackage ./pkgs {};
 
-      default = self.packages.${system}.caddy;
+      default = self.packages.${pkgs.system}.caddy;
     });
 
     nixosModules = {
-      caddy = import ./modules inputs;
+      caddy = import ./modules self;
 
       default = self.nixosModules.caddy;
     };

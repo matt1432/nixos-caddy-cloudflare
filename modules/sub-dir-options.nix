@@ -1,5 +1,4 @@
 {cfg}: {
-  config,
   lib,
   name,
   ...
@@ -10,13 +9,13 @@ in {
     subDirName = mkOption {
       type = types.str;
       default = name;
-      description = lib.mdDoc "The sub directory name to handle.";
+      description = "The sub directory name to handle.";
     };
 
     reverseProxy = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Option to give the parameters to a simple "reverse_proxy" command
         appended after extraConfig.
       '';
@@ -25,7 +24,7 @@ in {
     experimental = mkOption {
       type = types.bool;
       default = false;
-      description = lib.mdDoc ''
+      description = ''
         Specify if the app being proxied expects to be under a subdirectory.
         If it doesn't, we can attempt to circumvent that but it is not guaranteed
         to work for every app.
@@ -35,7 +34,7 @@ in {
     extraConfig = mkOption {
       type = types.lines;
       default = "";
-      description = lib.mdDoc ''
+      description = ''
         Additional lines of configuration appended to this sub domain in the
         automatically generated `Caddyfile`.
       '';

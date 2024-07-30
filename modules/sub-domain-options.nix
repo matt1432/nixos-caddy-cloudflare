@@ -1,5 +1,4 @@
 {cfg}: {
-  config,
   lib,
   name,
   ...
@@ -10,20 +9,20 @@ in {
     subDomainName = mkOption {
       type = types.str;
       default = name;
-      description = lib.mdDoc "The sub domain name to handle.";
+      description = "The sub domain name to handle.";
     };
 
     reverseProxy = mkOption {
       type = types.nullOr types.str;
       default = null;
-      description = lib.mdDoc ''
+      description = ''
         Option to give the parameters to a simple "reverse_proxy" command
         appended after extraConfig.
       '';
     };
 
     subDirectories = mkOption {
-      type = with types; attrsOf (submodule (import ./sub-dir-options.nix {inherit cfg;}));
+      type = types.attrsOf (types.submodule (import ./sub-dir-options.nix {inherit cfg;}));
       default = {};
       example = literalExpression ''
         {
@@ -36,7 +35,7 @@ in {
           };
         };
       '';
-      description = lib.mdDoc ''
+      description = ''
         Declarative specification of a subdomain's subdirectories served by Caddy.
       '';
     };
@@ -44,7 +43,7 @@ in {
     extraConfig = mkOption {
       type = types.lines;
       default = "";
-      description = lib.mdDoc ''
+      description = ''
         Additional lines of configuration appended to this sub domain in the
         automatically generated `Caddyfile`.
       '';
