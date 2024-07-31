@@ -4,11 +4,11 @@ self: {
   pkgs,
   ...
 }: let
-  inherit (lib) types literalExpression;
+  inherit (lib) types literalExpression mkRemovedOptionModule mkRenamedOptionModule;
   inherit (lib.attrsets) attrValues catAttrs listToAttrs nameValuePair optionalAttrs;
   inherit (lib.lists) filter optional unique;
   inherit (lib.modules) mkDefault mkIf;
-  inherit (lib.options) mkEnableOption mkOption mkRemovedOptionModule mkRenamedOptionModule;
+  inherit (lib.options) mkEnableOption mkOption;
   inherit (lib.strings) concatMapStringsSep concatStringsSep optionalString stringLength substring toUpper;
 
   cfg = config.services.caddy;
