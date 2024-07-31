@@ -1,4 +1,4 @@
-self: {
+self: nixpkgs: {
   config,
   lib,
   pkgs,
@@ -102,10 +102,10 @@ self: {
 
   acmeHosts = unique (catAttrs "useACMEHost" acmeVHosts);
 
-  mkCertOwnershipAssertion = import "${pkgs.path}/nixos/modules/security/acme/mk-cert-ownership-assertion.nix";
+  mkCertOwnershipAssertion = import "${nixpkgs}/nixos/modules/security/acme/mk-cert-ownership-assertion.nix";
 in {
   disabledModules = [
-    "${pkgs.path}/nixos/modules/services/web-servers/caddy/default.nix"
+    "${nixpkgs}/nixos/modules/services/web-servers/caddy/default.nix"
   ];
 
   imports = [

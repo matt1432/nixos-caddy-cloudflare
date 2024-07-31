@@ -33,7 +33,7 @@
     });
 
     nixosModules = {
-      caddy = import ./modules self;
+      caddy = import ./modules self nixpkgs;
 
       default = self.nixosModules.caddy;
     };
