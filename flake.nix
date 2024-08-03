@@ -38,9 +38,9 @@
       default = self.nixosModules.caddy;
     };
 
-    formatter = perSystem (_: pkgs: pkgs.alejandra);
+    formatter = perSystem (pkgs: pkgs.alejandra);
 
-    devShells = perSystem (_: pkgs: {
+    devShells = perSystem (pkgs: {
       update = pkgs.mkShell {
         packages = with pkgs; [
           alejandra
