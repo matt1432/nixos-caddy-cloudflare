@@ -1,3 +1,7 @@
+> [!NOTE]
+>
+> This repo is now deprecated because of https://github.com/NixOS/nixpkgs/pull/358586
+
 # Patched Caddy NixOS flake
 
 Caddy's third-party plugins are installed by adding them as import in
